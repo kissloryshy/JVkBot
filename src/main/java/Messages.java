@@ -14,16 +14,14 @@ public class Messages {
         return String.valueOf(rand);
     }
 
-    void sendMessage() {
+    void sendMessage(String message) {
         //send message
-        String access_token_community = "eef95c0ffa7249014b33c18aeae39c65047b6fb2eda930f687a61c327d62be79f7b953bf53b2a4c67d388";
-        String id = "95026222";
-        String mes = "Hello_world";
-        String r = "https://api.vk.com/method/messages.send?user_id=" + id
+        String mes = message;
+        String r = "https://api.vk.com/method/messages.send?user_id=" + Variables.getFromId()
                 + "&random_id=" +getRand()
-                + "&peer_id=" + id
+                + "&peer_id=" + Variables.getFromId()
                 + "&message=" + mes
-                + "&access_token=" + access_token_community
+                + "&access_token=" + Variables.getAccess_token_community()
                 + "&v=5.103";
 
         HttpClient client = HttpClient.newHttpClient();
@@ -37,47 +35,47 @@ public class Messages {
     }
 
     void getDialogs() {
-        String access_token_community = "eef95c0ffa7249014b33c18aeae39c65047b6fb2eda930f687a61c327d62be79f7b953bf53b2a4c67d388";
         String count = "1";
-        String id;
-        String r = "https://api.vk.com/method/messages.getConversations?count=1&filter=unread&"
+        String r = "https://api.vk.com/method/messages.getConversations?count=" + count
+                + "&filter=unread&"
                 + "group_id" + "187747735"
-                + "&access_token=" + access_token_community
+                + "&access_token=" + Variables.getAccess_token_community()
                 + "&v=5.103";
 
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder().uri(URI.create(r)).build();
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            System.out.println(response.body());
+            System.out.println("getDialogs " + response.body());
+
             JSONObject root = new JSONObject(response.body());
-            JSONObject secont = root.getJSONObject("response");
-            if (secont.getInt("count") == 0)
+            JSONObject second = root.getJSONObject("response");
+            if (second.getInt("count") == 0)
                 return;
-            JSONArray three = secont.getJSONArray("items");
+            JSONArray three = second.getJSONArray("items");
             JSONObject four = three.getJSONObject(0);
             JSONObject five = four.getJSONObject("last_message");
             String msg = five.getString("text");
+            System.out.println("Message = " + msg);
             long lng = five.getLong("from_id");
-            String fromId = String.valueOf(lng);
+            Variables.setFromId(String.valueOf(lng));
 
-            Video video = new Video();
-            video.searchVideo(msg, fromId);
+            Parser parser = new Parser();
+            parser.parse(msg);
 
         } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
-    void sendMessageWithAttachment(String attachment, String fromId) {
-        String access_token_community = "eef95c0ffa7249014b33c18aeae39c65047b6fb2eda930f687a61c327d62be79f7b953bf53b2a4c67d388";
-        String id = fromId;
-        String mes = "Hello_world";
-        String r = "https://api.vk.com/method/messages.send?user_id=" + id
+    void sendMessageWithAttachment(String msg, String attachment) {
+        msg = msg.replaceAll(" ", "+");
+        String r = "https://api.vk.com/method/messages.send?user_id=" + Variables.getFromId()
                 + "&random_id=" +getRand()
-                + "&peer_id=" + fromId
+                + "&peer_id=" + Variables.getFromId()
+                + "&message=" + msg
                 + "&attachment=" + attachment
-                + "&access_token=" + access_token_community
+                + "&access_token=" + Variables.getAccess_token_community()
                 + "&v=5.103";
 
         HttpClient client = HttpClient.newHttpClient();

@@ -1,22 +1,22 @@
 public class JVkBotThread {
 
-    private boolean isStarted;
+    private boolean isSuspend;
 
-    JVkBotThread(boolean isStarted) {
-        this.isStarted = isStarted;
+    JVkBotThread(boolean isSuspend) {
+        this.isSuspend = isSuspend;
     }
 
     void parse () {
         Messages messages = new Messages();
 
-        if (isStarted) {
-            while (true) {
-                try {
+        while (true) {
+            try {
+                if (!isSuspend) {
                     messages.getDialogs();
-                    Thread.sleep(3000);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
                 }
+                Thread.sleep(3500);
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
         }
     }
